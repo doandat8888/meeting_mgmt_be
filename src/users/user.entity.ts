@@ -28,18 +28,14 @@ export class User {
     @Column({ nullable: true })
     avatar: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     role: string;
 
     @Exclude()
     @Column({ name: 'created_at'})
     createdAt: Date;
 
-    /* @Exclude()
-    @Column({ name: 'updated_at'})
-    updateddAt: Date;
-
     @Exclude()
-    @Column({ name: 'deleted_at'})
-    deletedAt: Date; */
+    @Column({ name: 'updated_at'})
+    updatedAt: Date;
 }

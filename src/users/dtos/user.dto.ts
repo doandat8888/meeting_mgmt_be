@@ -27,4 +27,7 @@ export class UserDto {
 
     @Expose()
     createdAt: Date;
+
+    @Expose()
+    updatedAt: Date;
 }

@@ -26,7 +26,8 @@ export class UsersService {
                 password: passwordHash, 
                 fullName, 
                 role: 'employee', 
-                createdAt: date
+                createdAt: date,
+                updatedAt: date
             });
             // return the user
             return this.repo.save(user);
@@ -37,7 +38,7 @@ export class UsersService {
     }
 
     async updateUser(user: Partial<UpdateUserDto>, email: string): Promise<User | undefined> {
-        const userExist = await this.repo.findOne({ where: {email} });
+        const userExist = await this.repo.findOne({ where: { email} });
         if(!userExist) {
             throw new BadRequestException('User not found');
         }
@@ -50,6 +51,8 @@ export class UsersService {
                     key !== 'createdAt' &&
                     key !== 'role'
                 ) {
+                    let date = new Date();
+                    userExist.updatedAt = date;
                     userExist[key] = user[key];
                 }
             })

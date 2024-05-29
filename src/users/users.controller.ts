@@ -8,31 +8,24 @@ import { UserDto } from './dtos/user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
+@UseGuards(AuthGuard)
+@UseInterceptors(CurrentUserInterceptor)
+@Serialize(UserDto)
+
 @Controller('users')
 export class UsersController {
 
     constructor(private userService: UsersService) {}
 
-    @UseGuards(AuthGuard)
-    @UseInterceptors(CurrentUserInterceptor)
-    @Serialize(UserDto)
     @Patch(':email')
     updateUser(@Param('email') email: string, @Body() updateUserDto: Partial<UpdateUserDto>, @CurrentUser() currentUser: User) {
         if(currentUser.email !== email) throw new UnauthorizedException();
         return this.userService.updateUser(updateUserDto, email);
     }
-
-    @UseGuards(AuthGuard)
-    @UseInterceptors(CurrentUserInterceptor)
-    @Serialize(UserDto)
     @Get('profile')
     getCurrentUser(@CurrentUser() currentUser: User) {
         return currentUser;
     }
-
-    @UseGuards(AuthGuard)
-    @UseInterceptors(CurrentUserInterceptor)
-    @Serialize(UserDto)
     @Get('')
     getAllUsers(@CurrentUser() currentUser: User) {
         if(currentUser.role !== 'admin') throw new UnauthorizedException();

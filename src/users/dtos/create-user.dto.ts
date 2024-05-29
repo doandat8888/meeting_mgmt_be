@@ -11,6 +11,6 @@ export class CreateUserDto {
 
     @IsString()
     @IsNotEmpty()
-    full_name: string
+    fullName: string
 
 }

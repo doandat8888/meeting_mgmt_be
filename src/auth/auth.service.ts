@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { comparePassword, hashPassword } from 'src/utils/hash-password.util';
 
@@ -10,7 +11,7 @@ export class AuthService {
         private jwtService: JwtService,
     ) { }
 
-    async signIn(email: string, password: string): Promise<any> {
+    async signIn(email: string, password: string, response: Response): Promise<any> {
         const user = await this.usersService.findOne(email);
         if (!user) {
             throw new BadRequestException('User not found');
@@ -25,9 +26,12 @@ export class AuthService {
                 role: user.role
             }
             const token = await this.jwtService.signAsync(payload);
+            const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+            this.setCookie(response, token, refreshToken);
+
             return {
                 accessToken: token,
-                refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' })
+                refresh_token: refreshToken
             };
         } catch (error) {
             console.log("Error when sign token: ", error);
@@ -52,13 +56,13 @@ export class AuthService {
         }
     }
 
-    async refreshToken(refreshToken: string) {
+    async refreshToken(refreshToken: string, response: Response) {
         try {
             const payload = await this.jwtService.verifyAsync(
                 refreshToken,
                 {
                     secret: process.env.JWT_SECRET
-                }    
+                }
             )
             const user = await this.usersService.findOne(payload.email);
             if (!user) {
@@ -69,13 +73,27 @@ export class AuthService {
                 role: user.role
             }
             const token = await this.jwtService.signAsync(newPayload);
+            const newRefreshToken = this.jwtService.sign(newPayload, { expiresIn: '7d' });
+            this.setCookie(response, token, newRefreshToken);
             return {
                 accessToken: token,
-                refresh_token: this.jwtService.sign(newPayload, { expiresIn: '7d' })
+                refresh_token: newRefreshToken
             };
         } catch (e) {
             console.log("Error when refresh token: ", e);
             throw new UnauthorizedException('Internal server error');
         }
+    }
+
+    setCookie(response: Response, accessToken: string, refreshToken: string) {
+        response.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            maxAge: 86400000 // 1 day in milliseconds for accessToken
+        });
+
+        response.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            maxAge: 604800000 // 7 days in milliseconds for refreshToken
+        });
     }
 }

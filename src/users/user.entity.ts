@@ -6,8 +6,8 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    full_name: string;
+    @Column({name: 'full_name'})
+    fullName: string;
 
     @Column()
     email: string;
@@ -19,8 +19,8 @@ export class User {
     @Column({ nullable: true })
     provider: string;
 
-    @Column({ nullable: true})
-    phone_number: string;
+    @Column({ nullable: true, name: 'phone_number' })
+    phoneNumber: string;
 
     @Column({ nullable: true })
     address: string;
@@ -32,6 +32,14 @@ export class User {
     role: string;
 
     @Exclude()
-    @Column()
-    created_at: Date;
+    @Column({ name: 'created_at'})
+    createdAt: Date;
+
+    /* @Exclude()
+    @Column({ name: 'updated_at'})
+    updateddAt: Date;
+
+    @Exclude()
+    @Column({ name: 'deleted_at'})
+    deletedAt: Date; */
 }

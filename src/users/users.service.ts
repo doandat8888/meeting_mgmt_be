@@ -18,15 +18,15 @@ export class UsersService {
         return this.repo.findOne({ where: { email } });
     }
 
-    async create(email: string, passwordHash: string, full_name: string): Promise<User | undefined> {
+    async create(email: string, passwordHash: string, fullName: string): Promise<User | undefined> {
         try {
             let date = new Date();
             const user = await this.repo.create({ 
                 email, 
                 password: passwordHash, 
-                full_name, 
+                fullName, 
                 role: 'employee', 
-                created_at: date
+                createdAt: date
             });
             // return the user
             return this.repo.save(user);
@@ -47,7 +47,7 @@ export class UsersService {
                     key !== 'email' && 
                     key !== 'password' && 
                     key !== 'id' && 
-                    key !== 'created_at' &&
+                    key !== 'createdAt' &&
                     key !== 'role'
                 ) {
                     userExist[key] = user[key];

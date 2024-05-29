@@ -8,13 +8,13 @@ export class UserDto {
     email: string;
 
     @Expose()
-    full_name: string;
+    fullName: string;
 
     @Expose()
     provider: string;
 
     @Expose()
-    phone_number: string;
+    phoneNumber: string;
 
     @Expose()
     address: string;
@@ -26,5 +26,5 @@ export class UserDto {
     role: string;
 
     @Expose()
-    created_at: Date;
+    createdAt: Date;
 }

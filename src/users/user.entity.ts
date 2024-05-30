@@ -1,10 +1,10 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, Exclusion, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({name: 'full_name'})
     fullName: string;

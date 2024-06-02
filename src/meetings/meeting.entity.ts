@@ -1,5 +1,5 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { meetingType } from "./enums/meeting.enum";
 
 @Entity('meetings')
@@ -34,9 +34,12 @@ export class Meeting {
     @Column({ name: 'updated_by' })
     updatedBy: string;
 
-    @Column({ name: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @Column({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
+
+    @DeleteDateColumn({name: 'deleted_at', nullable: true})
+    deletedAt: Date;
 }

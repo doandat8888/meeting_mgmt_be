@@ -33,7 +33,7 @@ export class UsersService {
             return this.repo.save(user);
         } catch (error) {
             console.log(error);
-            throw new BadRequestException("Internal error");
+            throw new BadRequestException("Internal server error");
         }
     }
 
@@ -59,7 +59,7 @@ export class UsersService {
             return this.repo.save(userExist);
         } catch (error) {
             console.log(error);
-            throw new BadRequestException("Internal error");
+            throw new BadRequestException("Internal server error");
         }
     }
 }

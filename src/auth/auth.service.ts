@@ -52,7 +52,7 @@ export class AuthService {
             return user;
         } catch (error) {
             console.log(error);
-            throw new BadRequestException("Internal error");
+            throw new BadRequestException("Internal server error");
         }
     }
 

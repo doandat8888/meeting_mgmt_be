@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CurrentUserInterceptor } from 'src/interceptors/current-user.interceptor';
@@ -6,6 +6,7 @@ import { User } from 'src/users/user.entity';
 import { CreateMeetingDto } from './dtos/create-meeting.dto';
 import { MeetingsService } from './meetings.service';
 import { UpdateMeetingDto } from './dtos/update.meeting.dto';
+import { Meeting } from './meeting.entity';
 
 @Controller('meetings')
 @UseGuards(AuthGuard)
@@ -27,6 +28,11 @@ export class MeetingsController {
         return this.meetingService.create(createMeetingDto, currentUser.id);
     }
 
+    @Get('/filter')
+    async searchMeeting(@Query() searchParams) {
+        return this.meetingService.search(searchParams);
+    }
+
     @Get('/:id')
     findOne(@Param('id') meetingId: string) {
         return this.meetingService.findOne(meetingId);
@@ -39,7 +45,7 @@ export class MeetingsController {
             throw new BadRequestException('Meeting not found');
         }
         if(meeting.createdBy !== currentUser.id) throw new UnauthorizedException();
-        return this.meetingService.update(meeting, updateMeetingDto);
+        return this.meetingService.update(meeting, updateMeetingDto, currentUser.id);
     }
 
     @Delete('/delete/:id')
@@ -48,13 +54,14 @@ export class MeetingsController {
         if(!meeting) {
             throw new BadRequestException('Meeting not found');
         }
-        if(meeting.createdBy!== currentUser.id) throw new UnauthorizedException();
+        if(meeting.createdBy !== currentUser.id) throw new UnauthorizedException();
         return this.meetingService.softDelete(meeting);
     }
 
     @Get('/recover/:id')
     async recover(@Param('id') meetingId: string, @CurrentUser() currentUser: User) {
         const meeting = await this.meetingService.findOneDeleted(meetingId);
+        if(meeting.createdBy !== currentUser.id) throw new UnauthorizedException();
         return this.meetingService.recover(meeting);
     }
 }

@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Query } from '@nestjs/common';
 import { CreateMeetingDto } from './dtos/create-meeting.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meeting } from './meeting.entity';
 import { Repository } from 'typeorm';
 import { UpdateMeetingDto } from './dtos/update.meeting.dto';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class MeetingsService {
@@ -45,14 +46,15 @@ export class MeetingsService {
         }
     }
 
-    async update(meeting: Meeting, updateMeetingDto: UpdateMeetingDto) {
+    async update(meeting: Meeting, updateMeetingDto: UpdateMeetingDto, userId: string) {
         await this.checkDuplicateMeeting(updateMeetingDto);
         try {
             Object.keys(updateMeetingDto).forEach(key => {
                 if (meeting[key]!== undefined && key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
                     meeting[key] = updateMeetingDto[key];
                 }
-            })
+            });
+            meeting['updatedBy'] = userId;
             return this.repo.save(meeting);
         } catch (error) {
             console.log(error);
@@ -68,11 +70,17 @@ export class MeetingsService {
         });
         if(!existMeetings) return ;
         for (const existMeeting of existMeetings) {
+            // Convert time to UTC
+            const meetingStartTimeUTC = moment(meetingDto.startTime).utc();
+            const meetingEndTimeUTC = moment(meetingDto.endTime).utc();
+            const existMeetingStartTimeUTC = moment(existMeeting.startTime).utc();
+            const existMeetingEndTimeUTC = moment(existMeeting.endTime).utc();
+        
             const isOverlapping = 
-                (meetingDto.startTime < existMeeting.endTime && meetingDto.endTime > existMeeting.startTime) ||
-                (meetingDto.startTime >= existMeeting.startTime && meetingDto.startTime < existMeeting.endTime) ||
-                (meetingDto.endTime > existMeeting.startTime && meetingDto.endTime <= existMeeting.endTime) ||
-                (meetingDto.startTime <= existMeeting.startTime && meetingDto.endTime >= existMeeting.endTime);
+                (meetingStartTimeUTC.isBefore(existMeetingEndTimeUTC) && meetingEndTimeUTC.isAfter(existMeetingStartTimeUTC)) ||
+                (meetingStartTimeUTC.isSameOrAfter(existMeetingStartTimeUTC) && meetingStartTimeUTC.isBefore(existMeetingEndTimeUTC)) ||
+                (meetingEndTimeUTC.isAfter(existMeetingStartTimeUTC) && meetingEndTimeUTC.isSameOrBefore(existMeetingEndTimeUTC)) ||
+                (meetingStartTimeUTC.isSameOrBefore(existMeetingStartTimeUTC) && meetingEndTimeUTC.isSameOrAfter(existMeetingEndTimeUTC));
         
             if (isOverlapping) {
                 throw new BadRequestException('This time has been booked for another meeting.');
@@ -86,5 +94,33 @@ export class MeetingsService {
 
     async recover(meeting: Meeting) {
         return this.repo.recover(meeting);
+    }
+
+    async search(@Query() searchParams: string[]) { 
+        const meetings = await this.findAll();
+        for (const key in searchParams) {
+            // Check if user has key
+            if (!meetings[0][key]) {
+                throw new BadRequestException('This property is not exist');
+            }
+        }
+        const searchResult = await this.findMeetingByParams(searchParams, meetings);
+        if (searchResult.length === 0) {
+            throw new BadRequestException('Meeting not found');
+        }
+        return searchResult;
+    }
+
+    async findMeetingByParams(searchParams: string[], meetings: Meeting[]): Promise<Meeting[]> {
+        return meetings.filter(meeting => {
+            for (const key in searchParams) {
+                if (searchParams[key]) {
+                    if (meeting[key].toLowerCase().indexOf(searchParams[key].toLowerCase()) === -1) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
     }
 }

@@ -47,20 +47,51 @@ export class MeetingsService {
     }
 
     async update(meeting: Meeting, updateMeetingDto: UpdateMeetingDto, userId: string) {
-        await this.checkDuplicateMeeting(updateMeetingDto);
         try {
+            const { location, startTime, endTime } = updateMeetingDto;
+    
+            // Case 1: Keep location, change startTime or endTime
+            if ((startTime || endTime) && !location) {
+                await this.checkDuplicateMeeting({
+                    location: meeting.location,
+                    startTime: startTime || meeting.startTime,
+                    endTime: endTime || meeting.endTime
+                });
+            }
+    
+            // Case 2: Change location, keep startTime and endTime
+            if (location && !startTime && !endTime) {
+                await this.checkDuplicateMeeting({
+                    location: location,
+                    startTime: meeting.startTime,
+                    endTime: meeting.endTime
+                });
+            }
+    
+            // Case 3: Change location and change startTime or endTime
+            if (location && (startTime || endTime)) {
+                await this.checkDuplicateMeeting({
+                    location: location,
+                    startTime: startTime || meeting.startTime,
+                    endTime: endTime || meeting.endTime
+                });
+            }
+    
+            // Update meeting with new values from updateMeetingDto
             Object.keys(updateMeetingDto).forEach(key => {
-                if (meeting[key]!== undefined && key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
+                if (meeting[key] !== undefined && key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
                     meeting[key] = updateMeetingDto[key];
                 }
             });
+    
             meeting['updatedBy'] = userId;
-            return this.repo.save(meeting);
+            return await this.repo.save(meeting);
         } catch (error) {
             console.log(error);
             throw new BadRequestException("Internal server error");
         }
     }
+    
 
     async checkDuplicateMeeting(meetingDto: CreateMeetingDto | UpdateMeetingDto) {
         const existMeetings = await this.repo.find({

@@ -6,7 +6,6 @@ import { User } from 'src/users/user.entity';
 import { CreateMeetingDto } from './dtos/create-meeting.dto';
 import { MeetingsService } from './meetings.service';
 import { UpdateMeetingDto } from './dtos/update.meeting.dto';
-import { Meeting } from './meeting.entity';
 
 @Controller('meetings')
 @UseGuards(AuthGuard)

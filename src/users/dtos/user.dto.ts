@@ -11,6 +11,9 @@ export class UserDto {
     fullName: string;
 
     @Expose()
+    dateOfBirth: Date;
+
+    @Expose()
     provider: string;
 
     @Expose()
@@ -30,4 +33,7 @@ export class UserDto {
 
     @Expose()
     updatedAt: Date;
+
+    @Expose()
+    deletedAt: Date;
 }

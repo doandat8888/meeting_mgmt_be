@@ -1,73 +1,155 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# MEETING_MGMT APPLICATION
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# meeting-mgmt-jwat Postman Collection
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This Postman collection is for managing users and meetings, including authentication, user management, meeting scheduling, and file uploads via Cloudinary.
 
-## Description
+## Collection Information
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Collection Name:** meeting-mgmt-jwat
+- **Schema:** [Postman Collection Schema v2.1.0](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
+- **Postman ID:** 36b98387-3a7a-4099-8852-fdcbe70fd30f
+- **Exporter ID:** 17845214
 
-## Installation
+## Folders and Requests
 
-```bash
-$ yarn install
-```
+### Users
 
-## Running the app
+1. **Get All Users**
+   - **Method:** GET
+   - **URL:** `http://localhost:3000/users`
+   - **Auth:** Bearer Token
+   - **Description:** Retrieves a list of all users.
 
-```bash
-# development
-$ yarn run start
+2. **Refresh Token**
+   - **Method:** GET
+   - **Description:** Endpoint to refresh authentication token.
 
-# watch mode
-$ yarn run start:dev
+3. **Create New User**
+   - **Method:** POST
+   - **URL:** `http://localhost:8000/auth/register`
+   - **Body:** 
+     ```json
+     {
+       "email": "loi.tran.clv@gmail.com",
+       "password": "123456",
+       "fullName": "Tran Duc Loi"
+     }
+     ```
+   - **Description:** Registers a new user.
 
-# production mode
-$ yarn run start:prod
-```
+4. **Login**
+   - **Method:** POST
+   - **URL:** `http://localhost:8000/auth/login`
+   - **Body:**
+     ```json
+     {
+       "email": "loi.tran.clv@gmail.com",
+       "password": "123456"
+     }
+     ```
+   - **Description:** Authenticates a user and provides a token.
 
-## Test
+5. **Get Current User**
+   - **Method:** GET
+   - **URL:** `http://localhost:8000/users/profile`
+   - **Auth:** Bearer Token
+   - **Description:** Retrieves the current user's profile.
 
-```bash
-# unit tests
-$ yarn run test
+6. **Update User Info**
+   - **Method:** PATCH
+   - **URL:** `http://localhost:8000/users/thy.tran.clv@gmail.com`
+   - **Body:**
+     ```json
+     {
+       "fullName": "Tran Hoang Thanh Thy"
+     }
+     ```
+   - **Description:** Updates the specified user's information.
 
-# e2e tests
-$ yarn run test:e2e
+7. **Refresh Token**
+   - **Method:** POST
+   - **URL:** `http://localhost:8000/auth/refresh-token`
+   - **Body:**
+     ```json
+     {
+       "refreshToken": "token_string"
+     }
+     ```
+   - **Description:** Refreshes the user's authentication token.
 
-# test coverage
-$ yarn run test:cov
-```
+8. **Search Users**
+   - **Method:** GET
+   - **URL:** `http://localhost:8000/users/filter?email=d`
+   - **Description:** Searches for users by email.
 
-## Support
+9. **Soft Delete User**
+   - **Method:** DELETE
+   - **URL:** `http://localhost:8000/users/81ba4fc2-6e7f-4e96-baec-152efe3c7d10`
+   - **Description:** Soft deletes a user by ID.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+10. **Restore User**
+    - **Method:** GET
+    - **URL:** `http://localhost:8000/users/recover/81ba4fc2-6e7f-4e96-baec-152efe3c7d10`
+    - **Description:** Restores a soft-deleted user by ID.
 
-## Stay in touch
+### Meetings
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. **Add New Meeting**
+   - **Method:** POST
+   - **URL:** `http://localhost:8000/meetings`
+   - **Body:**
+     ```json
+     {
+       "title": "CPS Kickoff",
+       "type": "Project Kickoff",
+       "description": "Initial meeting to discuss project kickoff.",
+       "note": "Bring all necessary documents.",
+       "startTime": "2024-06-01T05:40:18.982Z",
+       "endTime": "2024-06-01T06:40:18.982Z",
+       "location": "Conference Room 1"
+     }
+     ```
+   - **Description:** Schedules a new meeting.
 
-## License
+2. **Soft Delete Meeting**
+   - **Method:** DELETE
+   - **URL:** `http://localhost:8000/meetings/delete/0630bd5d-a045-4c97-bbc7-d8638a7d8ef9`
+   - **Description:** Soft deletes a meeting by ID.
 
-Nest is [MIT licensed](LICENSE).
+3. **Find Meeting**
+   - **Method:** GET
+   - **URL:** `http://localhost:8000/meetings/0630bd5d-a045-4c97-bbc7-d8638a7d8ef9`
+   - **Description:** Retrieves a meeting by ID.
+
+4. **Update Meeting**
+   - **Method:** PATCH
+   - **URL:** `http://localhost:8000/meetings/0630bd5d-a045-4c97-bbc7-d8638a7d8ef9`
+   - **Body:**
+     ```json
+     {
+       "title": "CARIS Kickoff"
+     }
+     ```
+   - **Description:** Updates meeting details.
+
+5. **Restore Meeting**
+   - **Method:** GET
+   - **URL:** `http://localhost:8000/meetings/recover/0630bd5d-a045-4c97-bbc7-d8638a7d8ef9`
+   - **Description:** Restores a soft-deleted meeting by ID.
+
+6. **Find Meeting by Params**
+   - **Method:** GET
+   - **URL:** `http://localhost:8000/meetings/filter?title=p`
+   - **Description:** Finds meetings based on query parameters.
+
+### Cloudinary
+
+1. **Upload File**
+   - **Method:** POST
+   - **URL:** `http://localhost:8000/cloudinary/upload`
+   - **Body:** Form-data with file field containing the file path.
+   - **Description:** Uploads a file to Cloudinary.
+
+---
+

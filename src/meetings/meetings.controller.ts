@@ -22,7 +22,7 @@ export class MeetingsController {
         return 'This is meeting route';
     }
 
-    @Post('/create')
+    @Post('/')
     create(@Body() createMeetingDto: CreateMeetingDto, @CurrentUser() currentUser: User) {
         return this.meetingService.create(createMeetingDto, currentUser.id);
     }
@@ -37,7 +37,7 @@ export class MeetingsController {
         return this.meetingService.findOne(meetingId);
     }
 
-    @Patch('/update/:id')
+    @Patch('/:id')
     async update(@Param('id') meetingId: string, @Body() updateMeetingDto: UpdateMeetingDto, @CurrentUser() currentUser: User) {
         const meeting = await this.meetingService.findOne(meetingId);
         if(!meeting) {
@@ -47,7 +47,7 @@ export class MeetingsController {
         return this.meetingService.update(meeting, updateMeetingDto, currentUser.id);
     }
 
-    @Delete('/delete/:id')
+    @Delete('/:id')
     async delete(@Param('id') meetingId: string, @CurrentUser() currentUser: User) {
         const meeting = await this.meetingService.findOne(meetingId);
         if(!meeting) {

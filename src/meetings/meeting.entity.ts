@@ -4,7 +4,7 @@ import { meetingType } from "./enums/meeting.enum";
 
 @Entity('meetings')
 export class Meeting {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn('uuid', { name: 'meeting_id' })
     id: string;
 
     @Column()

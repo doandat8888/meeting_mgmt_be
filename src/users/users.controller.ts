@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserDto } from './dtos/user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
+import { role } from './enums/role.enum';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(CurrentUserInterceptor)
@@ -19,7 +20,7 @@ export class UsersController {
 
     @Patch('/:email')
     updateUser(@Param('email') email: string, @Body() updateUserDto: Partial<UpdateUserDto>, @CurrentUser() currentUser: User) {
-        if(currentUser.email !== email) throw new UnauthorizedException();
+        if(currentUser.email !== email || currentUser.role !== role.admin) throw new UnauthorizedException();
         return this.userService.updateUser(updateUserDto, email);
     }
     @Get('/filter')
@@ -32,7 +33,7 @@ export class UsersController {
     }
     @Get('')
     getAllUsers(@CurrentUser() currentUser: User) {
-        if(currentUser.role !== 'admin') throw new UnauthorizedException();
+        if(currentUser.role !== role.admin) throw new UnauthorizedException();
         return this.userService.findAll();
     }
 
@@ -42,14 +43,14 @@ export class UsersController {
         if(!user) {
             throw new BadRequestException('User not found');
         }
-        if(currentUser.role !== 'admin') throw new UnauthorizedException();
+        if(currentUser.role !== role.admin) throw new UnauthorizedException();
         return this.userService.softDelete(user);
     }
 
     @Get('/recover/:id')
     async recover(@Param('id') userId: string, @CurrentUser() currentUser: User) {
         const user = await this.userService.findOneDeleted(userId);
-        if(currentUser.role !== 'admin') throw new UnauthorizedException();
+        if(currentUser.role !== role.admin) throw new UnauthorizedException();
         return this.userService.recover(user);
     }
 }

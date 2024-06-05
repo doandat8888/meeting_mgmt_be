@@ -6,6 +6,7 @@ import { User } from 'src/users/user.entity';
 import { CreateMeetingDto } from './dtos/create-meeting.dto';
 import { MeetingsService } from './meetings.service';
 import { UpdateMeetingDto } from './dtos/update.meeting.dto';
+import { role } from 'src/users/enums/role.enum';
 
 @Controller('meetings')
 @UseGuards(AuthGuard)
@@ -16,7 +17,7 @@ export class MeetingsController {
     
     @Get('/')
     getAllMeetings(@CurrentUser() currentUser: User): string {
-        if(currentUser.role !== 'admin') {
+        if(currentUser.role !== role.admin) {
             throw new UnauthorizedException();
         }
         return 'This is meeting route';

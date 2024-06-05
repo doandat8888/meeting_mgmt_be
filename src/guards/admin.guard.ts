@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { role } from "src/users/enums/role.enum";
 
 @Injectable()
 
@@ -8,6 +9,6 @@ export class AdminGuard implements CanActivate {
         if(!request.currentUser) return false;
         console.log(request.currentUser);
         const user = request.currentUser;
-        return user.currentUser.role === 'admin';
+        return user.currentUser.role === role.admin;
     }
 }

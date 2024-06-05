@@ -9,17 +9,18 @@ export class CloudinaryService {
         const extension = getExtension(file);
         return new Promise((resolve, reject) => {
             const upload = v2.uploader.upload_stream(
-                { 
-                    resource_type: 'auto', 
-                    format: extension ? extension : 'zip' 
+                {
+                    resource_type: 'auto',
+                    format: extension ? extension : 'zip'
                 },
                 (error, result) => {
-                if(error) {
-                    console.log(error);
-                    reject(error);
+                    if (error) {
+                        console.log(error);
+                        reject(error);
+                    }
+                    resolve(result);
                 }
-                resolve(result);
-            });
+            );
             streamifier.createReadStream(file.buffer).pipe(upload);
         })
     }

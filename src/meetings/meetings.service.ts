@@ -21,6 +21,10 @@ export class MeetingsService {
         return await this.repo.findOne({ where: { id: meetingId }});
     }
 
+    async findByUserId(userId: string): Promise<Meeting[]> {
+        return await this.repo.find({ where: { createdBy: userId }});
+    }
+
     async findOneDeleted(meetingId: string): Promise<Meeting> {
         return await this.repo.findOne({ where: { id: meetingId }, withDeleted: true});
     }

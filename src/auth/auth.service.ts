@@ -86,11 +86,15 @@ export class AuthService {
     setCookie(response: Response, accessToken: string, refreshToken: string) {
         response.cookie('accessToken', accessToken, {
             httpOnly: true,
+            secure: true,
+            sameSite: "lax",
             maxAge: 86400000 // 1 day in milliseconds for accessToken
         });
 
         response.cookie('refreshToken', refreshToken, {
             httpOnly: true,
+            secure: true,
+            sameSite: "lax",
             maxAge: 604800000 // 7 days in milliseconds for refreshToken
         });
     }

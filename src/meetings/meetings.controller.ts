@@ -23,6 +23,11 @@ export class MeetingsController {
         return 'This is meeting route';
     }
 
+    @Get('/current')
+    getCurrentMeetings(@CurrentUser() currentUser: User) {
+        return this.meetingService.findByUserId(currentUser.id);
+    }
+
     @Post('/')
     create(@Body() createMeetingDto: CreateMeetingDto, @CurrentUser() currentUser: User) {
         return this.meetingService.create(createMeetingDto, currentUser.id);

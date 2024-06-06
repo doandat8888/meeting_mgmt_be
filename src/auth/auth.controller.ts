@@ -29,4 +29,10 @@ export class AuthController {
     async refreshToken(@Body() req, @Res({ passthrough: true }) response: Response) {
         return this.authService.refreshToken(req.refreshToken, response);
     }
+
+    @UseGuards(AuthGuard)
+    @Post('logout')
+    signOut(@Res({ passthrough: true }) response: Response) {
+        return this.authService.signOut(response);
+    }
 }

@@ -30,8 +30,7 @@ export class AuthService {
             this.setCookie(response, token, refreshToken);
 
             return {
-                accessToken: token,
-                refresh_token: refreshToken
+                message: 'Login successfuly'
             };
         } catch (error) {
             console.log("Error when sign token: ", error);
@@ -76,8 +75,7 @@ export class AuthService {
             const newRefreshToken = this.jwtService.sign(newPayload, { expiresIn: '7d' });
             this.setCookie(response, token, newRefreshToken);
             return {
-                accessToken: token,
-                refresh_token: newRefreshToken
+                message: 'Refresh token successfully'
             };
         } catch (e) {
             console.log("Error when refresh token: ", e);
@@ -95,5 +93,11 @@ export class AuthService {
             httpOnly: true,
             maxAge: 604800000 // 7 days in milliseconds for refreshToken
         });
+    }
+
+    async signOut(response: Response): Promise<any> {
+        response.clearCookie('accessToken');
+        response.clearCookie('refreshToken');
+        return { message: 'Logged out successfully'}
     }
 }

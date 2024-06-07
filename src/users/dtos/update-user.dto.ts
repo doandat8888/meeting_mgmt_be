@@ -1,4 +1,5 @@
-import { IsString } from "class-validator"
+import { IsDate, IsEnum, IsString } from "class-validator"
+import { gender } from "../enums/gender.enum"
 
 export class UpdateUserDto {
 
@@ -13,4 +14,19 @@ export class UpdateUserDto {
 
     @IsString()
     avatar: string
+
+    @IsString()
+    phoneNumber: string;
+
+    @IsDate()
+    dateOfBirth: Date;
+
+    @IsEnum(gender, {
+        message: 'Gender must be one of: male, female, other'
+    })
+    gender: gender;
+
+    @IsString()
+    provider: string;
+
 }

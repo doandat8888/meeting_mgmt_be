@@ -26,11 +26,11 @@ export class AuthService {
                 role: user.role
             }
             const token = await this.jwtService.signAsync(payload);
-            const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+            const refreshToken = this.jwtService.sign(payload, { expiresIn: '1d' });
             this.setCookie(response, token, refreshToken);
-
             return {
-                message: 'Login successfuly'
+                accessToken: token,
+                refreshToken: refreshToken
             };
         } catch (error) {
             console.log("Error when sign token: ", error);
@@ -72,10 +72,11 @@ export class AuthService {
                 role: user.role
             }
             const token = await this.jwtService.signAsync(newPayload);
-            const newRefreshToken = this.jwtService.sign(newPayload, { expiresIn: '7d' });
-            this.setCookie(response, token, newRefreshToken);
+            const newRefreshToken = this.jwtService.sign(newPayload, { expiresIn: '1d' });
+            this.setCookie(response, token, refreshToken);
             return {
-                message: 'Refresh token successfully'
+                accessToken: token,
+                refreshToken: newRefreshToken,
             };
         } catch (e) {
             console.log("Error when refresh token: ", e);
@@ -88,14 +89,14 @@ export class AuthService {
             httpOnly: true,
             secure: true,
             sameSite: "lax",
-            maxAge: 86400000 // 1 day in milliseconds for accessToken
+            maxAge: 3600000 // 1 hour in milliseconds for accessToken
         });
 
         response.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: "lax",
-            maxAge: 604800000 // 7 days in milliseconds for refreshToken
+            maxAge: 86400000 // 1 day in milliseconds for refreshToken
         });
     }
 

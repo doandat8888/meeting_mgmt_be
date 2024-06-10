@@ -20,8 +20,8 @@ export class UsersController {
 
     @Patch('/:email')
     updateUser(@Param('email') email: string, @Body() updateUserDto: Partial<UpdateUserDto>, @CurrentUser() currentUser: User) {
-        if(currentUser.email !== email || currentUser.role !== role.admin) throw new UnauthorizedException();
-        return this.userService.updateUser(updateUserDto, email);
+        if(currentUser.email === email || currentUser.role === role.admin) return this.userService.updateUser(updateUserDto, email);
+        throw new UnauthorizedException();
     }
     @Get('/filter')
     async searchMeeting(@Query() searchParams) {

@@ -32,9 +32,9 @@ export class MeetingsService {
     async create(createMeetingDto: CreateMeetingDto, userId: string) {
         await this.checkDuplicateMeeting(createMeetingDto);
         try {
-            const meeting = await this.repo.create({
+            const meeting = this.repo.create({
                 title: createMeetingDto.title,
-                type: createMeetingDto.type,
+                tag: createMeetingDto.tag,
                 description: createMeetingDto.description,
                 note: createMeetingDto.note,
                 startTime: createMeetingDto.startTime,

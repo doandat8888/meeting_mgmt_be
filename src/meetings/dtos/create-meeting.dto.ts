@@ -1,5 +1,4 @@
-import { IsDate, IsEmail, IsNotEmpty, IsString } from "class-validator"
-import { meetingType } from "../enums/meeting.enum"
+import { IsNotEmpty, IsString } from "class-validator"
 
 export class CreateMeetingDto {
 
@@ -9,7 +8,7 @@ export class CreateMeetingDto {
 
     @IsString()
     @IsNotEmpty()
-    type: meetingType
+    tag: string
 
     @IsString()
     @IsNotEmpty()

@@ -77,7 +77,7 @@ export class UsersService {
 
 
     async updateUser(user: Partial<UpdateUserDto>, email: string): Promise<User | undefined> {
-        const userExist = await this.repo.findOne({ where: { email} });
+        const userExist = await this.repo.findOne({ where: { email } });
         if(!userExist) {
             throw new BadRequestException('User not found');
         }

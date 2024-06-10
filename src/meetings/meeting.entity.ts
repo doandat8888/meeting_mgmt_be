@@ -1,6 +1,4 @@
-import { Exclude } from "class-transformer";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { meetingType } from "./enums/meeting.enum";
 
 @Entity('meetings')
 export class Meeting {
@@ -11,7 +9,7 @@ export class Meeting {
     title: string;
 
     @Column()
-    type: meetingType;
+    tag: string;
 
     @Column()
     description: string;

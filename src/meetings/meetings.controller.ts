@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UnauthorizedException, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CurrentUserInterceptor } from 'src/interceptors/current-user.interceptor';
@@ -29,7 +29,7 @@ export class MeetingsController {
     }
 
     @Post('/')
-    create(@Body() createMeetingDto: CreateMeetingDto, @CurrentUser() currentUser: User) {
+    create(@Body(ValidationPipe) createMeetingDto: CreateMeetingDto, @CurrentUser() currentUser: User) {
         return this.meetingService.create(createMeetingDto, currentUser.id);
     }
 

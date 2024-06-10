@@ -37,6 +37,11 @@ export class UsersController {
         return this.userService.findAll();
     }
 
+    @Get('/:id')
+    getUserById(@Param('id') id: string) {
+        return this.userService.findOneById(id);
+    }
+
     @Delete('/:id')
     async delete(@Param('id') userId: string, @CurrentUser() currentUser: User) {
         const user = await this.userService.findOneById(userId);

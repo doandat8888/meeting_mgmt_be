@@ -14,6 +14,7 @@ import { UsersModule } from 'src/users/users.module';
         UsersModule
     ],
     controllers: [MeetingsController],
-    providers: [MeetingsService]
+    providers: [MeetingsService],
+    exports: [MeetingsService]
 })
 export class MeetingsModule { }

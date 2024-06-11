@@ -8,6 +8,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { MeetingsModule } from './meetings/meetings.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { UsermeetingsModule } from './usermeetings/usermeetings.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
     imports: [
@@ -18,11 +20,13 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         UsersModule,
         AuthModule,
         MeetingsModule,
-        CloudinaryModule
+        CloudinaryModule,
+        UsermeetingsModule,
+        FilesModule
     ],
     controllers: [AppController],
     providers: [
-        AppService,
+        AppService
     ],
 })
 export class AppModule { }

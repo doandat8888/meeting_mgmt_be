@@ -1,25 +1,22 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UnauthorizedException, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { CurrentUserInterceptor } from 'src/interceptors/current-user.interceptor';
 import { User } from 'src/users/user.entity';
 import { CreateMeetingDto } from './dtos/create-meeting.dto';
 import { MeetingsService } from './meetings.service';
 import { UpdateMeetingDto } from './dtos/update.meeting.dto';
 import { role } from 'src/users/enums/role.enum';
+import { AdminGuard } from 'src/guards/admin.guard';
 
 @Controller('meetings')
 @UseGuards(AuthGuard)
-@UseInterceptors(CurrentUserInterceptor)
 export class MeetingsController {
 
     constructor(private meetingService: MeetingsService) {}
     
     @Get('/')
-    getAllMeetings(@CurrentUser() currentUser: User): string {
-        if(currentUser.role !== role.admin) {
-            throw new UnauthorizedException();
-        }
+    @UseGuards(AdminGuard)
+    getAllMeetings(): string {
         return 'This is meeting route';
     }
 

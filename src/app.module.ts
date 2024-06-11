@@ -10,6 +10,7 @@ import { MeetingsModule } from './meetings/meetings.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { UsermeetingsModule } from './usermeetings/usermeetings.module';
 import { FilesModule } from './files/files.module';
+import { MeetingminutesModule } from './meetingminutes/meetingminutes.module';
 
 @Module({
     imports: [
@@ -22,7 +23,8 @@ import { FilesModule } from './files/files.module';
         MeetingsModule,
         CloudinaryModule,
         UsermeetingsModule,
-        FilesModule
+        FilesModule,
+        MeetingminutesModule
     ],
     controllers: [AppController],
     providers: [

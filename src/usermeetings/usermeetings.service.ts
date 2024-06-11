@@ -59,7 +59,7 @@ export class UsermeetingsService {
             return this.repo.save(userMeeting);
         } catch (error) {
             console.log(error);
-            throw new BadRequestException("Internal server error");
+            throw new BadRequestException(error.response.message);
         }
     }
 

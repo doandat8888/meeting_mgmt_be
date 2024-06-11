@@ -73,9 +73,7 @@ export class UsersService {
             return true;
         });
     }
-
-
-
+    
     async updateUser(user: Partial<UpdateUserDto>, email: string): Promise<User | undefined> {
         const userExist = await this.repo.findOne({ where: { email } });
         if(!userExist) {

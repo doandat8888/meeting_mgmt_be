@@ -32,8 +32,7 @@ export class UsersController {
         return currentUser;
     }
     @Get('')
-    getAllUsers(@CurrentUser() currentUser: User) {
-        if(currentUser.role !== role.admin) throw new UnauthorizedException();
+    getAllUsers() {
         return this.userService.findAll();
     }
 

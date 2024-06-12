@@ -75,7 +75,11 @@ export class UsermeetingsService {
             if (existUser) {
                 throw new BadRequestException('User already in meeting');
             }
-
+            const meeting = await this.meetingService.findOne(meetingId);
+            const user = await this.userService.findOneById(userId);
+            if(meeting.createdBy === userId) {
+                throw new BadRequestException('You can not add the owner to the meeting');
+            }
             const userMeeting = await this.repo.create({
                 userId,
                 meetingId,

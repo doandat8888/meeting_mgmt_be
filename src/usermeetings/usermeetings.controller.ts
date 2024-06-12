@@ -11,7 +11,7 @@ import { AttendGuard } from 'src/guards/attendees.guard';
 
 @Controller('usermeetings')
 @UseGuards(AuthGuard)
-@Serialize(UserDto)
+
 export class UsermeetingsController {
 
     constructor(
@@ -20,6 +20,7 @@ export class UsermeetingsController {
     ) {}
 
     @UseGuards(AttendGuard)
+    @Serialize(UserDto)
     @Get('/attendees/:meetingId')
     async getAttendees(@Param('meetingId') meetingId: string) {
         return this.userMeetingService.getAttendees(meetingId);
@@ -37,5 +38,10 @@ export class UsermeetingsController {
         const meeting = await this.meetingService.findOne(meetingId);
         if(meeting.createdBy !== currentUser.id) throw new UnauthorizedException();
         return this.userMeetingService.remove(userId, meetingId);
+    }
+
+    @Get('/meetings/attend')
+    async getMeetingsAttend(@CurrentUser() currentUser: User) {
+        return this.userMeetingService.getMeetingsAttend(currentUser.id);
     }
 }

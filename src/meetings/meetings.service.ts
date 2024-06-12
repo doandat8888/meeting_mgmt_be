@@ -11,26 +11,26 @@ export class MeetingsService {
 
     constructor(
         @InjectRepository(Meeting) private repo: Repository<Meeting>
-    ) {}
+    ) { }
 
     async findAll(): Promise<Meeting[]> {
         return await this.repo.find();
     }
 
     async findOne(meetingId: string): Promise<Meeting> {
-        return await this.repo.findOne({ where: { id: meetingId }});
+        return await this.repo.findOne({ where: { id: meetingId } });
     }
 
     async findByUserId(userId: string): Promise<Meeting[]> {
-        return await this.repo.find({ where: { createdBy: userId }});
+        return await this.repo.find({ where: { createdBy: userId } });
     }
 
     async findOneDeleted(meetingId: string): Promise<Meeting> {
-        return await this.repo.findOne({ where: { id: meetingId }, withDeleted: true});
+        return await this.repo.findOne({ where: { id: meetingId }, withDeleted: true });
     }
 
     async create(createMeetingDto: CreateMeetingDto, userId: string) {
-        await this.checkDuplicateMeeting(createMeetingDto);
+        await this.checkDuplicateMeetingCreate(createMeetingDto);
         try {
             const meeting = this.repo.create({
                 title: createMeetingDto.title,
@@ -53,41 +53,41 @@ export class MeetingsService {
     async update(meeting: Meeting, updateMeetingDto: UpdateMeetingDto, userId: string) {
         try {
             const { location, startTime, endTime } = updateMeetingDto;
-    
+
             // Case 1: Keep location, change startTime or endTime
             if ((startTime || endTime) && !location) {
-                await this.checkDuplicateMeeting({
+                await this.checkDuplicateMeetingUpdate(meeting.id, {
                     location: meeting.location,
                     startTime: startTime || meeting.startTime,
                     endTime: endTime || meeting.endTime
                 });
             }
-    
+
             // Case 2: Change location, keep startTime and endTime
             if (location && !startTime && !endTime) {
-                await this.checkDuplicateMeeting({
+                await this.checkDuplicateMeetingUpdate(meeting.id, {
                     location: location,
                     startTime: meeting.startTime,
                     endTime: meeting.endTime
                 });
             }
-    
+
             // Case 3: Change location and change startTime or endTime
             if (location && (startTime || endTime)) {
-                await this.checkDuplicateMeeting({
+                await this.checkDuplicateMeetingUpdate(meeting.id, {
                     location: location,
                     startTime: startTime || meeting.startTime,
                     endTime: endTime || meeting.endTime
                 });
             }
-    
+
             // Update meeting with new values from updateMeetingDto
             Object.keys(updateMeetingDto).forEach(key => {
                 if (meeting[key] !== undefined && key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
                     meeting[key] = updateMeetingDto[key];
                 }
             });
-    
+
             meeting['updatedBy'] = userId;
             return await this.repo.save(meeting);
         } catch (error) {
@@ -95,30 +95,57 @@ export class MeetingsService {
             throw new BadRequestException("Internal server error");
         }
     }
-    
 
-    async checkDuplicateMeeting(meetingDto: CreateMeetingDto | UpdateMeetingDto) {
+    async checkDuplicateMeetingCreate(meetingDto: CreateMeetingDto | UpdateMeetingDto) {
         const existMeetings = await this.repo.find({
             where: {
                 location: meetingDto.location,
             }
         });
-        if(!existMeetings) return ;
+        if (!existMeetings) return;
         for (const existMeeting of existMeetings) {
             // Convert time to UTC
             const meetingStartTimeUTC = moment(meetingDto.startTime).utc();
             const meetingEndTimeUTC = moment(meetingDto.endTime).utc();
             const existMeetingStartTimeUTC = moment(existMeeting.startTime).utc();
             const existMeetingEndTimeUTC = moment(existMeeting.endTime).utc();
-        
-            const isOverlapping = 
+
+            const isOverlapping =
                 (meetingStartTimeUTC.isBefore(existMeetingEndTimeUTC) && meetingEndTimeUTC.isAfter(existMeetingStartTimeUTC)) ||
                 (meetingStartTimeUTC.isSameOrAfter(existMeetingStartTimeUTC) && meetingStartTimeUTC.isBefore(existMeetingEndTimeUTC)) ||
                 (meetingEndTimeUTC.isAfter(existMeetingStartTimeUTC) && meetingEndTimeUTC.isSameOrBefore(existMeetingEndTimeUTC)) ||
                 (meetingStartTimeUTC.isSameOrBefore(existMeetingStartTimeUTC) && meetingEndTimeUTC.isSameOrAfter(existMeetingEndTimeUTC));
-        
+
             if (isOverlapping) {
                 throw new BadRequestException('This time has been booked for another meeting.');
+            }
+        }
+    }
+
+    async checkDuplicateMeetingUpdate(meetingId: string, meetingDto: CreateMeetingDto | UpdateMeetingDto) {
+        const existMeetings = await this.repo.find({
+            where: {
+                location: meetingDto.location,
+            }
+        });
+        if (!existMeetings) return;
+        for (const existMeeting of existMeetings) {
+            if (existMeeting.id !== meetingId) {
+                // Convert time to UTC
+                const meetingStartTimeUTC = moment(meetingDto.startTime).utc();
+                const meetingEndTimeUTC = moment(meetingDto.endTime).utc();
+                const existMeetingStartTimeUTC = moment(existMeeting.startTime).utc();
+                const existMeetingEndTimeUTC = moment(existMeeting.endTime).utc();
+
+                const isOverlapping =
+                    (meetingStartTimeUTC.isBefore(existMeetingEndTimeUTC) && meetingEndTimeUTC.isAfter(existMeetingStartTimeUTC)) ||
+                    (meetingStartTimeUTC.isSameOrAfter(existMeetingStartTimeUTC) && meetingStartTimeUTC.isBefore(existMeetingEndTimeUTC)) ||
+                    (meetingEndTimeUTC.isAfter(existMeetingStartTimeUTC) && meetingEndTimeUTC.isSameOrBefore(existMeetingEndTimeUTC)) ||
+                    (meetingStartTimeUTC.isSameOrBefore(existMeetingStartTimeUTC) && meetingEndTimeUTC.isSameOrAfter(existMeetingEndTimeUTC));
+
+                if (isOverlapping) {
+                    throw new BadRequestException('This time has been booked for another meeting.');
+                }
             }
         }
     }
@@ -131,7 +158,7 @@ export class MeetingsService {
         return this.repo.recover(meeting);
     }
 
-    async search(@Query() searchParams: string[]) { 
+    async search(@Query() searchParams: string[]) {
         const meetings = await this.findAll();
         for (const key in searchParams) {
             // Check if user has key

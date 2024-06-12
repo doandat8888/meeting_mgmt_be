@@ -4,17 +4,43 @@ import { UserMeeting } from './usermeeting.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.entity';
+import { MeetingsService } from 'src/meetings/meetings.service';
+import { Meeting } from 'src/meetings/meeting.entity';
 
 @Injectable()
 export class UsermeetingsService {
 
     constructor(
         @InjectRepository(UserMeeting) private repo: Repository<UserMeeting>,
-        private userService: UsersService
+        private userService: UsersService,
+        private meetingService: MeetingsService
     ) { }
 
     async findOne(userId: string, meetingId: string): Promise<UserMeeting> {
         return await this.repo.findOne({ where: { userId, meetingId } });
+    }
+
+    async getMeetingsAttend(userId: string) {
+        try {
+            const meetings: Meeting[] = [];
+            const usermeetings = await this.repo.find({ where: { userId } });
+            if (usermeetings) {
+                for (let usermeeting of usermeetings) {
+                    let meeting = await this.meetingService.findOne(usermeeting.meetingId);
+                    if (meeting) {
+                        meetings.push(meeting);
+                    }
+                }
+            }
+            const meetingCreated = await this.meetingService.findByUserId(userId);
+            if(meetingCreated) {
+                meetings.push(...meetingCreated);
+            }
+            return meetings;
+        } catch (error) {
+            console.log(error);
+            throw new BadRequestException("Internal server error");
+        }
     }
 
     async getAttendees(meetingId: string): Promise<User[]> {

@@ -27,11 +27,14 @@ export class UsermeetingsService {
             if (usermeetings) {
                 for (let usermeeting of usermeetings) {
                     let meeting = await this.meetingService.findOne(usermeeting.meetingId);
-                    if (meeting) {
-                        meetings.push(meeting);
+                    if (meeting && userId !== meeting.createdBy) {
+                        meetings.push(meeting);  //Just add user involved in the meeting, 
                     }
                 }
             }
+            let meetingsCreated = await this.meetingService.findByUserId(userId);
+            meetings.push(...meetingsCreated); //Add user created the meeting
+            // I do so because sometimes the user created the meeting is not in the meeting
             return meetings;
         } catch (error) {
             console.log(error);

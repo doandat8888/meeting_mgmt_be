@@ -5,8 +5,8 @@ import { User } from 'src/users/user.entity';
 import { CreateMeetingDto } from './dtos/create-meeting.dto';
 import { MeetingsService } from './meetings.service';
 import { UpdateMeetingDto } from './dtos/update.meeting.dto';
-import { role } from 'src/users/enums/role.enum';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { AttendGuard } from 'src/guards/attendees.guard';
 
 @Controller('meetings')
 @UseGuards(AuthGuard)
@@ -35,6 +35,7 @@ export class MeetingsController {
         return this.meetingService.search(searchParams);
     }
 
+    @UseGuards(AttendGuard)
     @Get('/:id')
     findOne(@Param('id') meetingId: string) {
         return this.meetingService.findOne(meetingId);

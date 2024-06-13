@@ -3,16 +3,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { File } from './file.entity';
 import { Repository } from 'typeorm';
 import { UpdateFileDto } from './dtos/update-file.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class FilesService {
 
     constructor(
         @InjectRepository(File) private repo: Repository<File>,
+        private userService: UsersService
     ) {}
 
     async getFiles(meetingId: string): Promise<File[]> {
-        return this.repo.find({ where: { meetingId } });
+        const files = await this.repo.find({ where: { meetingId } });
+        const userIds = files.map(file => file.createdBy);
+        const users = await Promise.all(userIds.map(userId => this.userService.findOneById(userId)));
+        files.forEach(file => {
+            file.createdBy = users.find(user => user.id === file.createdBy).fullName;
+        });
+        return files;
     }
 
     async delete(fileId: string) {

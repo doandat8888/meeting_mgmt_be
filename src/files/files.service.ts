@@ -14,13 +14,14 @@ export class FilesService {
     ) {}
 
     async getFiles(meetingId: string): Promise<File[]> {
-        const files = await this.repo.find({ where: { meetingId } });
-        const userIds = files.map(file => file.createdBy);
-        const users = await Promise.all(userIds.map(userId => this.userService.findOneById(userId)));
-        files.forEach(file => {
-            file.createdBy = users.find(user => user.id === file.createdBy).fullName;
-        });
-        return files;
+        // const files = await this.repo.find({ where: { meetingId } });
+        // const userIds = files.map(file => file.createdBy);
+        // const users = await Promise.all(userIds.map(userId => this.userService.findOneById(userId)));
+        // files.forEach(file => {
+        //     file.userCreateName = users.find(user => user.id === file.createdBy).fullName;
+        // });
+        // return files;
+        return this.repo.find({ where: { meetingId } });
     }
 
     async delete(fileId: string) {

@@ -11,17 +11,18 @@ export class FilesService {
     constructor(
         @InjectRepository(File) private repo: Repository<File>,
         private userService: UsersService
-    ) {}
+    ) { }
 
-    async getFiles(meetingId: string): Promise<File[]> {
-        // const files = await this.repo.find({ where: { meetingId } });
-        // const userIds = files.map(file => file.createdBy);
-        // const users = await Promise.all(userIds.map(userId => this.userService.findOneById(userId)));
-        // files.forEach(file => {
-        //     file.userCreateName = users.find(user => user.id === file.createdBy).fullName;
-        // });
-        // return files;
-        return this.repo.find({ where: { meetingId } });
+    async getFiles(meetingId: string): Promise<any> {
+        const files = await this.repo.find({ where: { meetingId } });
+        const filesWithUsers = await Promise.all(files.map(async (file) => {
+            const user = await this.userService.findOneById(file.createdBy);
+            return user ? {
+                ...file,
+                userCreateName: user.fullName
+            } : file;
+        }));
+        return filesWithUsers;
     }
 
     async delete(fileId: string) {
@@ -53,7 +54,7 @@ export class FilesService {
                     file[key] = updateFileDto[key];
                 }
             });
-    
+
             file['updatedBy'] = userId;
             return await this.repo.save(file);
         } catch (error) {

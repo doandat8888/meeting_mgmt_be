@@ -19,10 +19,8 @@ export class AttendGuard implements CanActivate {
         const currentUser = request.user;
         const user = await this.userService.findOne(currentUser.email);
         if(!user) return false;
-        console.log(user);
         const meetingId = request.params.id;
         const userMeeting = await this.userMeetingService.findOne(user.id, meetingId);
-        console.log(userMeeting);
         const meeting = await this.meetingService.findOne(meetingId);
         return userMeeting !== null || meeting.createdBy === user.id;
     }

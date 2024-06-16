@@ -31,4 +31,10 @@ export class MeetingminutesController {
     async findLatest(@Param('meetingId') meetingId: string) {
         return this.meetingMinutesService.findLatest(meetingId);
     }
+
+    @Get('/current')
+    @UseGuards(AttendGuard)
+    async findMeetingMinutesCurrent(@CurrentUser() currentUser: User) {
+        return this.meetingMinutesService.findMeetingMinutesCurrent(currentUser.id);
+    }
 }

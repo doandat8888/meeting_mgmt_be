@@ -12,16 +12,18 @@ export class AttendGuard implements CanActivate {
         private userMeetingService: UsermeetingsService,
         private meetingService: MeetingsService
     ) {}
-    // Only admin and people who attend are allowed to see attendees
+    // Only people who attend are allowed to see attendees
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
         if(!request.user) return false;
         const currentUser = request.user;
         const user = await this.userService.findOne(currentUser.email);
         if(!user) return false;
-        const meetingId = request.params.meetingId;
+        console.log(user);
+        const meetingId = request.params.id;
         const userMeeting = await this.userMeetingService.findOne(user.id, meetingId);
+        console.log(userMeeting);
         const meeting = await this.meetingService.findOne(meetingId);
-        return currentUser.role === role.admin || userMeeting !== null || meeting.createdBy === user.id;
+        return userMeeting !== null || meeting.createdBy === user.id;
     }
 }

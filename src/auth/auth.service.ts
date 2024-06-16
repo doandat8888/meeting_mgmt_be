@@ -22,8 +22,7 @@ export class AuthService {
         }
         try {
             const payload = {
-                email: user.email,
-                role: user.role
+                email: user.email
             }
             const token = await this.jwtService.signAsync(payload);
             const refreshToken = this.jwtService.sign(payload, { expiresIn: '1d' });
@@ -68,8 +67,7 @@ export class AuthService {
                 throw new UnauthorizedException('User not found');
             }
             const newPayload = {
-                email: user.email,
-                role: user.role
+                email: user.email
             }
             const token = await this.jwtService.signAsync(newPayload);
             const newRefreshToken = this.jwtService.sign(newPayload, { expiresIn: '1d' });

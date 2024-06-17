@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Delete } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MeetingMinutes } from './meeting-minutes.entity';
 import { Repository } from 'typeorm';
@@ -16,17 +16,35 @@ export class MeetingMinutesService {
         private userService: UsersService
     ) {}
 
-    async create(name: string, link: string, meetingId: string, userId: string) {
+    async findAll(): Promise<MeetingMinutes[]>{
+        return this.repo.find();
+    }
+
+    async create(name: string, link: string, publicId: string, meetingId: string, userId: string) {
         try {
             let meetingminutes = await this.repo.create({
                 name,
                 link,
+                publicId,
                 meetingId,
                 createdBy: userId,
                 updatedBy: userId
             });
             return this.repo.save(meetingminutes);
         } catch (error: any) {
+            console.log(error);
+            throw new BadRequestException("Internal server error");
+        }
+    }
+
+    async findOne(meetingminutesId: string): Promise<MeetingMinutes> {
+        try {
+            let meetingminutes = await this.repo.findOne({ where: { id: meetingminutesId } });
+            if(!meetingminutes) {
+                throw new BadRequestException("Meeting minutes not found");
+            }
+            return meetingminutes;
+        } catch (error) {
             console.log(error);
             throw new BadRequestException("Internal server error");
         }
@@ -91,7 +109,7 @@ export class MeetingMinutesService {
         }
     }
 
-    async findAll(): Promise<MeetingMinutes[]>{
-        return this.repo.find();
+    async delete(meetingMinute: MeetingMinutes) {
+        return this.repo.remove(meetingMinute);
     }
 }

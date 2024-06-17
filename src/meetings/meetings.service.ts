@@ -40,6 +40,8 @@ export class MeetingsService {
                 startTime: createMeetingDto.startTime,
                 endTime: createMeetingDto.endTime,
                 location: createMeetingDto.location,
+                createdAt: new Date(),
+                updatedAt: new Date(),
                 createdBy: userId,
                 updatedBy: userId,
             });

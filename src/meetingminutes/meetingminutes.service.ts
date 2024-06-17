@@ -27,6 +27,8 @@ export class MeetingMinutesService {
                 link,
                 publicId,
                 meetingId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
                 createdBy: userId,
                 updatedBy: userId
             });

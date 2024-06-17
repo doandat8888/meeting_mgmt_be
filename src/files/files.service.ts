@@ -38,6 +38,8 @@ export class FilesService {
                 link,
                 publicId,
                 meetingId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
                 createdBy: idUser,
                 updatedBy: idUser
             });

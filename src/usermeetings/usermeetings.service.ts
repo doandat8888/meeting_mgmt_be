@@ -77,6 +77,8 @@ export class UsermeetingsService {
             const userMeeting = await this.repo.create({
                 userId,
                 meetingId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
                 createdBy: currentUserId,
                 updatedBy: currentUserId
             });

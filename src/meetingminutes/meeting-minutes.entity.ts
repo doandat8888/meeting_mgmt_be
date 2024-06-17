@@ -12,6 +12,9 @@ export class MeetingMinutes {
     @Column()
     link: string;
 
+    @Column({ name: 'public_id' })
+    publicId: string;
+
     @Column({ name: 'meeting_id' })
     meetingId: string;
 

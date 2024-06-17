@@ -9,6 +9,9 @@ export class CreateFileDto {
     link: string;
 
     @IsNotEmpty()
+    publicId: string;
+
+    @IsNotEmpty()
     type: string;
 
     @IsNotEmpty()

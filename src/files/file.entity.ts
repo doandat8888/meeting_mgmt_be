@@ -9,6 +9,9 @@ export class File {
     @Column()
     name: string;
 
+    @Column({ name: 'public_id'})
+    publicId: string;
+
     @Column()
     type: string;
 

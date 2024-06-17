@@ -9,5 +9,8 @@ export class CreateMeetingMinutesDto {
     link: string;
 
     @IsNotEmpty()
+    publicId: string;
+
+    @IsNotEmpty()
     meetingId: string;
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
 import { getExtension } from 'src/utils/get-extension.util';
+import { isImageAndPdf } from 'src/utils/image.util';
 import * as streamifier from 'streamifier';
 
 @Injectable()
@@ -22,6 +23,18 @@ export class CloudinaryService {
                 }
             );
             streamifier.createReadStream(file.buffer).pipe(upload);
+        })
+    }
+
+    deleteFile(publicId: string, type: string) {
+        return new Promise((resolve, reject) => {
+            v2.uploader.destroy(publicId, {resource_type: isImageAndPdf(type) ? 'image' : 'raw'}, (error, result) => {
+                if (error) {
+                    console.log(error);
+                    reject(error);
+                }
+                resolve(result);
+            });
         })
     }
 }

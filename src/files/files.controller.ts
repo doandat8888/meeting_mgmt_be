@@ -17,7 +17,7 @@ export class FilesController {
     @UseGuards(AttendGuard)
     @Post('/')
     createNewFile(@Body(ValidationPipe) createFileDto: CreateFileDto, @CurrentUser() currentUser: User) {
-        return this.filesService.create(createFileDto.name, createFileDto.type, createFileDto.link, createFileDto.meetingId, currentUser.id);
+        return this.filesService.create(createFileDto.name, createFileDto.type, createFileDto.link, createFileDto.publicId, createFileDto.meetingId, currentUser.id);
     }
 
     @UseGuards(AttendGuard)

@@ -30,13 +30,16 @@ export class FilesService {
         return this.repo.remove(file);
     }
 
-    async create(name: string, type: string, link: string, meetingId: string, idUser: string): Promise<File> {
+    async create(name: string, type: string, link: string, publicId: string, meetingId: string, idUser: string): Promise<File> {
         try {
             let file = await this.repo.create({
                 name,
                 type,
                 link,
+                publicId,
                 meetingId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
                 createdBy: idUser,
                 updatedBy: idUser
             });

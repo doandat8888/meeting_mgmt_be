@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserMeeting } from './usermeeting.entity';
 import { Repository } from 'typeorm';
@@ -13,7 +13,7 @@ export class UsermeetingsService {
     constructor(
         @InjectRepository(UserMeeting) private repo: Repository<UserMeeting>,
         private userService: UsersService,
-        private meetingService: MeetingsService
+        @Inject(forwardRef(() => MeetingsService)) private meetingService: MeetingsService
     ) { }
 
     async findOne(userId: string, meetingId: string): Promise<UserMeeting> {

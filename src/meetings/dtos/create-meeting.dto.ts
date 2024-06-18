@@ -7,15 +7,12 @@ export class CreateMeetingDto {
     title: string
 
     @IsString()
-    @IsNotEmpty()
     tag: string
 
     @IsString()
-    @IsNotEmpty()
     description: string
 
     @IsString()
-    @IsNotEmpty()
     note: string
 
     @IsNotEmpty()
@@ -25,6 +22,9 @@ export class CreateMeetingDto {
     endTime: Date
 
     @IsString()
-    @IsNotEmpty()
     location: string
+}
+
+export class CreateMeetingAndAttendeeDto extends CreateMeetingDto {
+    attendees: string[]
 }

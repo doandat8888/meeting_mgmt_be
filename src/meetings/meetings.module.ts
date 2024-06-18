@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MeetingsController } from './meetings.controller';
 import { MeetingsService } from './meetings.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,8 +12,9 @@ import { UsermeetingsModule } from 'src/usermeetings/usermeetings.module';
     imports: [
         TypeOrmModule.forFeature([Meeting]),
         JwtModule.registerAsync(jwtConfig),
-        forwardRef(() => UsermeetingsModule),
         UsersModule,
+        forwardRef(() => UsermeetingsModule),
+
     ],
     controllers: [MeetingsController],
     providers: [MeetingsService],

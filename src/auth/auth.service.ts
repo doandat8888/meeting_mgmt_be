@@ -71,7 +71,7 @@ export class AuthService {
             }
             const token = await this.jwtService.signAsync(newPayload);
             const newRefreshToken = this.jwtService.sign(newPayload, { expiresIn: '1d' });
-            this.setCookie(response, token, refreshToken);
+            this.setCookie(response, token, newRefreshToken);
             return {
                 accessToken: token,
                 refreshToken: newRefreshToken,

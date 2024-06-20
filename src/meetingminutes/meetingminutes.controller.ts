@@ -38,7 +38,7 @@ export class MeetingminutesController {
         return this.meetingMinutesService.findMeetingMinutesCurrent(currentUser.id);
     }
 
-    @Delete('/:meetingId')
+    @Delete('/:meetingMinutesId')
     async delete(@Param('meetingMinutesId') meetingMinutesId: string, @CurrentUser() currentUser: User) {
         const meetingMinute = await this.meetingMinutesService.findOne(meetingMinutesId);
         if(!meetingMinute) {

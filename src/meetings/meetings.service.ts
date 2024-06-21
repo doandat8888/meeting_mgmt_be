@@ -100,9 +100,10 @@ export class MeetingsService {
   ) {
     try {
       const { location, startTime, endTime } = updateMeetingDto;
-
+      
       // Case 1: Keep location, change startTime or endTime
       if ((startTime || endTime) && !location) {
+        console.log('case 1')
         await this.checkDuplicateMeetingUpdate(meeting.id, {
           location: meeting.location,
           startTime: startTime || meeting.startTime,
@@ -112,6 +113,7 @@ export class MeetingsService {
 
       // Case 2: Change location, keep startTime and endTime
       if (location && !startTime && !endTime) {
+        console.log('case 2')
         await this.checkDuplicateMeetingUpdate(meeting.id, {
           location: location,
           startTime: meeting.startTime,
@@ -121,6 +123,7 @@ export class MeetingsService {
 
       // Case 3: Change location and change startTime or endTime
       if (location && (startTime || endTime)) {
+        console.log('case 3')
         await this.checkDuplicateMeetingUpdate(meeting.id, {
           location: location,
           startTime: startTime || meeting.startTime,
@@ -143,8 +146,7 @@ export class MeetingsService {
       meeting['updatedBy'] = userId;
       return await this.repo.save(meeting);
     } catch (error) {
-      console.log(error);
-      throw new BadRequestException('Internal server error');
+      throw new BadRequestException(error.response.message);
     }
   }
 

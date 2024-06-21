@@ -64,6 +64,18 @@
         "fullName": "Tran Hoang Thanh Thy"
     }
     ```
+### Refresh Token
+
+- **Description**: Refresh the access token
+- **Request**: 
+  - Method: PATCH
+  - URL: `http://localhost:8000/users/0780c676-e7fe-4cf3-b28a-2e39889baf76`
+  - Body: 
+    ```json
+    {
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5naGlhLm5nby5jbHZAZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzE2OTkxMDA4LCJleHAiOjE3MTc1OTU4MDh9.jvBH0sDLGiSM26rgB8qyonDwnQ7RTlGgEF8R"
+    }
+    ```
 
 ### Search Users
 
@@ -292,11 +304,11 @@
   - URL: `http://localhost:8000/meetingminutes`
   - Body: 
     ```json
-   {
+    {
       "name": "file_rfdag0",
       "link": "https://res.cloudinary.com/dblglqzca/image/upload/v1717401196/file_rfdag0.pdf",
       "meetingId": "af3464cc-d3ec-4810-bae9-018456efdca3",
       "public_id": "f234an5"
-   }
+    }
     ```
 

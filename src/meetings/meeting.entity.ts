@@ -1,4 +1,6 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { File } from "src/files/file.entity";
+import { MeetingMinutes } from "src/meetingminutes/meeting-minutes.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('meetings')
 export class Meeting {
@@ -40,4 +42,10 @@ export class Meeting {
 
     @DeleteDateColumn({ name: 'deleted_at', nullable: true })
     deletedAt: Date;
+
+    @OneToMany(() => File, (file) => file.meeting)
+    files: File[];
+
+    @OneToMany(() => MeetingMinutes, (meetingMinute) => meetingMinute.meeting)
+    meetingMinutes: MeetingMinutes[];
 }

@@ -1,5 +1,6 @@
 import { Exclude } from "class-transformer";
-import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Meeting } from "src/meetings/meeting.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('meetingminutes')
 export class MeetingMinutes {
@@ -31,4 +32,8 @@ export class MeetingMinutes {
     @Exclude()
     @UpdateDateColumn({ name: 'updated_at'})
     updatedAt: Date;
+
+    @ManyToOne(() => Meeting, (meeting) => meeting.meetingMinutes)
+    @JoinColumn({ name:'meeting_id' })
+    meeting: Meeting;
 }

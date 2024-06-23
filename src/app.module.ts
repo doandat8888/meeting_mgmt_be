@@ -11,24 +11,32 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { UsermeetingsModule } from './usermeetings/usermeetings.module';
 import { FilesModule } from './files/files.module';
 import { MeetingminutesModule } from './meetingminutes/meetingminutes.module';
+import { CustomLoggerService } from './logger/logger.service';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './logger/logging.interceptor';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-        }),
-        TypeOrmModule.forRootAsync(typeOrmConfig),
-        UsersModule,
-        AuthModule,
-        MeetingsModule,
-        CloudinaryModule,
-        UsermeetingsModule,
-        FilesModule,
-        MeetingminutesModule
-    ],
-    controllers: [AppController],
-    providers: [
-        AppService
-    ],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync(typeOrmConfig),
+    UsersModule,
+    AuthModule,
+    MeetingsModule,
+    CloudinaryModule,
+    UsermeetingsModule,
+    FilesModule,
+    MeetingminutesModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    CustomLoggerService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}

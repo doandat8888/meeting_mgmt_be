@@ -118,10 +118,10 @@ export class AuthService {
   //     });
   // }
 
-  async signOut(response: Response): Promise<any> {
-    response.clearCookie('accessToken');
-    response.clearCookie('refreshToken');
-    this.logger.log('User logged out successfully');
-    return { message: 'Logged out successfully' };
-  }
+  //   async signOut(response: Response): Promise<any> {
+  //     response.clearCookie('accessToken');
+  //     response.clearCookie('refreshToken');
+  //     this.logger.log('User logged out successfully');
+  //     return { message: 'Logged out successfully' };
+  //   }
 }

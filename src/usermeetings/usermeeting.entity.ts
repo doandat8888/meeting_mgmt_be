@@ -25,4 +25,7 @@ export class UserMeeting {
     @Exclude()
     @UpdateDateColumn({ name: 'updated_at'})
     updatedAt: Date;
+
+    @Column({ name: 'attend_status', nullable: true })
+    attendStatus: string;
 }

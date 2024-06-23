@@ -11,24 +11,24 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { UsermeetingsModule } from './usermeetings/usermeetings.module';
 import { FilesModule } from './files/files.module';
 import { MeetingminutesModule } from './meetingminutes/meetingminutes.module';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-        }),
-        TypeOrmModule.forRootAsync(typeOrmConfig),
-        UsersModule,
-        AuthModule,
-        MeetingsModule,
-        CloudinaryModule,
-        UsermeetingsModule,
-        FilesModule,
-        MeetingminutesModule
-    ],
-    controllers: [AppController],
-    providers: [
-        AppService
-    ],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync(typeOrmConfig),
+    UsersModule,
+    AuthModule,
+    MeetingsModule,
+    CloudinaryModule,
+    UsermeetingsModule,
+    FilesModule,
+    MeetingminutesModule,
+    LoggerModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

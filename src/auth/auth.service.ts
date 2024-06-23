@@ -26,7 +26,7 @@ export class AuthService {
             }
             const token = await this.jwtService.signAsync(payload);
             const refreshToken = this.jwtService.sign(payload, { expiresIn: '1d' });
-            this.setCookie(response, token, refreshToken);
+            //this.setCookie(response, token, refreshToken);
             return {
                 accessToken: token,
                 refreshToken: refreshToken
@@ -71,7 +71,7 @@ export class AuthService {
             }
             const token = await this.jwtService.signAsync(newPayload);
             const newRefreshToken = this.jwtService.sign(newPayload, { expiresIn: '1d' });
-            this.setCookie(response, token, newRefreshToken);
+            //this.setCookie(response, token, newRefreshToken);
             return {
                 accessToken: token,
                 refreshToken: newRefreshToken,
@@ -82,21 +82,21 @@ export class AuthService {
         }
     }
 
-    setCookie(response: Response, accessToken: string, refreshToken: string) {
-        response.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "lax",
-            maxAge: 3600000 // 1 hour in milliseconds for accessToken
-        });
+    // setCookie(response: Response, accessToken: string, refreshToken: string) {
+    //     response.cookie('accessToken', accessToken, {
+    //         httpOnly: true,
+    //         secure: true,
+    //         sameSite: "lax",
+    //         maxAge: 3600000 // 1 hour in milliseconds for accessToken
+    //     });
 
-        response.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "lax",
-            maxAge: 86400000 // 1 day in milliseconds for refreshToken
-        });
-    }
+    //     response.cookie('refreshToken', refreshToken, {
+    //         httpOnly: true,
+    //         secure: true,
+    //         sameSite: "lax",
+    //         maxAge: 86400000 // 1 day in milliseconds for refreshToken
+    //     });
+    // }
 
     async signOut(response: Response): Promise<any> {
         response.clearCookie('accessToken');

@@ -6,6 +6,8 @@ import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.entity';
 import { MeetingsService } from 'src/meetings/meetings.service';
 import { Meeting } from 'src/meetings/meeting.entity';
+import { MailerService } from '@nest-modules/mailer';
+import { format } from 'date-fns';
 
 @Injectable()
 export class UsermeetingsService {
@@ -13,7 +15,8 @@ export class UsermeetingsService {
     constructor(
         @InjectRepository(UserMeeting) private repo: Repository<UserMeeting>,
         private userService: UsersService,
-        @Inject(forwardRef(() => MeetingsService)) private meetingService: MeetingsService
+        @Inject(forwardRef(() => MeetingsService)) private meetingService: MeetingsService,
+        private mailerService: MailerService
     ) { }
 
     async findOne(userId: string, meetingId: string): Promise<UserMeeting> {
@@ -42,7 +45,30 @@ export class UsermeetingsService {
         }
     }
 
-    async getAttendees(meetingId: string): Promise<User[]> {
+    async updateAttendStatus(userId: string, meetingId: string, status: string): Promise<UserMeeting | undefined> {
+        try {
+            const usermeeting = await this.repo.findOne({
+                where: {
+                    userId,
+                    meetingId
+                }
+            });
+            if(usermeeting) {
+                if(status === 'accepted') {
+                    usermeeting.attendStatus = '1';
+                }else if(status === 'rejected') {
+                    usermeeting.attendStatus = '2';
+                }
+                return this.repo.save(usermeeting);
+            }
+        } catch (error) {
+            console.log(error);
+            throw new BadRequestException("Internal server error");
+        }
+        
+    }
+
+    async getAttendees(meetingId: string): Promise<any> {
         try {
             let userMeetings = await this.repo.find({
                 where: {
@@ -53,7 +79,11 @@ export class UsermeetingsService {
             for (let userMeeting of userMeetings) {
                 const user = await this.userService.findOneById(userMeeting.userId);
                 if (user) {
-                    users.push(user);
+                    const userRes = {
+                        ...user,
+                        attendStatus: userMeeting.attendStatus
+                    }
+                    users.push(userRes);
                 }
             }
             return users;
@@ -80,12 +110,35 @@ export class UsermeetingsService {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 createdBy: currentUserId,
-                updatedBy: currentUserId
+                updatedBy: currentUserId,
+                attendStatus: '0' //Waiting for acceptance
             });
+            const user = await this.userService.findOneById(userId);
+            const meeting = await this.meetingService.findOne(meetingId);
+            const formattedDatetime = format(meeting.startTime, "yyyy-MM-dd HH:mm");
+            const separatedDateAndTime = formattedDatetime.split(" ");
+            const acceptUrl = `http://localhost:8000/usermeetings/changeStatus?userId=${userId}&meetingId=${meetingId}&status=accepted`
+            const rejectUrl = `http://localhost:8000/usermeetings/changeStatus?userId=${userId}&meetingId=${meetingId}&status=rejected`
+            if(user) {
+                await this.mailerService.sendMail({
+                    to: user.email,
+                    subject: `Invitation to meeting: ${meeting.title}`,
+                    template: 'invitation',
+                    context: {
+                        name: user.fullName,
+                        meetingTitle: meeting.title,
+                        date: separatedDateAndTime[0],
+                        time: separatedDateAndTime[1],
+                        location: meeting.location,
+                        acceptUrl,
+                        rejectUrl
+                    }
+                })
+            }
             return this.repo.save(userMeeting);
         } catch (error) {
             console.log(error);
-            throw new BadRequestException(error.response.message);
+            throw new BadRequestException(error);
         }
     }
 

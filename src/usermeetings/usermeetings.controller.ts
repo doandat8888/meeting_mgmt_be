@@ -1,13 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Res, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CreateUserMeetingDto } from './dtos/create-user-meeting.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { MeetingsService } from 'src/meetings/meetings.service';
 import { UsermeetingsService } from './usermeetings.service';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from 'src/users/user.entity';
-import { UserDto } from 'src/users/dtos/user.dto';
+import { UserWithAttendStatusDto } from 'src/users/dtos/user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { AttendGuard } from 'src/guards/attendees.guard';
+import { Response } from 'express';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('usermeetings')
 @UseGuards(AuthGuard)
@@ -20,7 +22,7 @@ export class UsermeetingsController {
     ) {}
 
     @UseGuards(AttendGuard)
-    @Serialize(UserDto)
+    @Serialize(UserWithAttendStatusDto)
     @Get('/attendees/:meetingId')
     async getAttendees(@Param('meetingId') meetingId: string) {
         return this.userMeetingService.getAttendees(meetingId);
@@ -43,5 +45,14 @@ export class UsermeetingsController {
     @Get('/meetings/attend')
     async getMeetingsAttend(@CurrentUser() currentUser: User) {
         return this.userMeetingService.getMeetingsAttend(currentUser.id);
+    }
+
+    @Public()
+    @Get('/changeStatus')
+    async updateAttendStatus(@Res() res: Response, @Query('userId') userId: string, @Query('meetingId') meetingId: string, @Query('status') status: string) {
+        const userMeetingUpdate = await this.userMeetingService.updateAttendStatus(userId, meetingId, status);
+        if(userMeetingUpdate) {
+            return res.redirect('http://localhost:3000/dashboard');
+        }
     }
 }

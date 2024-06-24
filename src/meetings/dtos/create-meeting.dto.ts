@@ -20,8 +20,10 @@ export class CreateMeetingDto {
     note: string
 
     @IsNotEmpty()
+    @IsDate()
     startTime: Date
 
+    @IsDate()
     @IsNotEmpty()
     endTime: Date
 

@@ -41,3 +41,8 @@ export class UserDto {
     @Expose()
     deletedAt: Date;
 }
+
+export class UserWithAttendStatusDto extends UserDto {
+    @Expose()
+    attendStatus: boolean;
+}

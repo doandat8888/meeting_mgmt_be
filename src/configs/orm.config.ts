@@ -11,7 +11,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
         port: parseInt(configService.get<string>('PGPORT')),
         database: configService.get<string>('PGDATABASE'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: true,
+        migrations: ['dist/database/migrations/*.js'],
         ssl: true,
     }),
     inject: [ConfigService]

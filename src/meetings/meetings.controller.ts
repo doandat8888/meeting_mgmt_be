@@ -1,25 +1,22 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UnauthorizedException, UseGuards, ValidationPipe } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { CurrentUserInterceptor } from 'src/interceptors/current-user.interceptor';
 import { User } from 'src/users/user.entity';
-import { CreateMeetingDto } from './dtos/create-meeting.dto';
+import { CreateMeetingAndAttendeeDto } from './dtos/create-meeting.dto';
 import { MeetingsService } from './meetings.service';
 import { UpdateMeetingDto } from './dtos/update.meeting.dto';
-import { role } from 'src/users/enums/role.enum';
+import { AdminGuard } from 'src/guards/admin.guard';
+import { AttendGuard } from 'src/guards/attendees.guard';
 
 @Controller('meetings')
 @UseGuards(AuthGuard)
-@UseInterceptors(CurrentUserInterceptor)
 export class MeetingsController {
 
     constructor(private meetingService: MeetingsService) {}
     
     @Get('/')
-    getAllMeetings(@CurrentUser() currentUser: User): string {
-        if(currentUser.role !== role.admin) {
-            throw new UnauthorizedException();
-        }
+    @UseGuards(AdminGuard)
+    getAllMeetings(): string {
         return 'This is meeting route';
     }
 
@@ -29,8 +26,8 @@ export class MeetingsController {
     }
 
     @Post('/')
-    create(@Body() createMeetingDto: CreateMeetingDto, @CurrentUser() currentUser: User) {
-        return this.meetingService.create(createMeetingDto, currentUser.id);
+    create(@Body(ValidationPipe) createMeetingAndAttendeeDto: CreateMeetingAndAttendeeDto, @CurrentUser() currentUser: User) {
+        return this.meetingService.create(createMeetingAndAttendeeDto, currentUser.id);
     }
 
     @Get('/filter')
@@ -38,6 +35,7 @@ export class MeetingsController {
         return this.meetingService.search(searchParams);
     }
 
+    @UseGuards(AttendGuard)
     @Get('/:id')
     findOne(@Param('id') meetingId: string) {
         return this.meetingService.findOne(meetingId);

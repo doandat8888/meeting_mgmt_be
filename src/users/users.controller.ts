@@ -1,7 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Query, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { CurrentUserInterceptor } from 'src/interceptors/current-user.interceptor';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserDto } from './dtos/user.dto';
@@ -10,7 +9,6 @@ import { UsersService } from './users.service';
 import { role } from './enums/role.enum';
 
 @UseGuards(AuthGuard)
-@UseInterceptors(CurrentUserInterceptor)
 @Serialize(UserDto)
 
 @Controller('users')
@@ -20,8 +18,8 @@ export class UsersController {
 
     @Patch('/:email')
     updateUser(@Param('email') email: string, @Body() updateUserDto: Partial<UpdateUserDto>, @CurrentUser() currentUser: User) {
-        if(currentUser.email !== email || currentUser.role !== role.admin) throw new UnauthorizedException();
-        return this.userService.updateUser(updateUserDto, email);
+        if(currentUser.email === email || currentUser.role === role.admin) return this.userService.updateUser(updateUserDto, email);
+        throw new UnauthorizedException();
     }
     @Get('/filter')
     async searchMeeting(@Query() searchParams) {
@@ -32,8 +30,7 @@ export class UsersController {
         return currentUser;
     }
     @Get('')
-    getAllUsers(@CurrentUser() currentUser: User) {
-        if(currentUser.role !== role.admin) throw new UnauthorizedException();
+    getAllUsers() {
         return this.userService.findAll();
     }
 

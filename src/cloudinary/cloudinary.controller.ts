@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from './cloudinary.service';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -16,8 +16,20 @@ export class CloudinaryController {
 
     @Post('/upload')
     @UseGuards(AuthGuard)
-    @UseInterceptors(FileInterceptor("file"))
+    @UseInterceptors(
+        FileInterceptor("file", {
+            limits: {
+                fileSize: 1024 * 1024 * 20
+            }
+        })
+    )
     uploadFile(@UploadedFile() file: Express.Multer.File) {
         return this.cloudinaryService.uploadFile(file);
+    }
+
+    @Delete('/')
+    @UseGuards(AuthGuard)
+    deleteFile(@Query('publicId') publicId: string, @Query('type') type: string) {
+        return this.cloudinaryService.deleteFile(publicId, type);
     }
 }

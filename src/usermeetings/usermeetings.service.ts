@@ -8,7 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserMeeting } from './usermeeting.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/user.entity';
 import { MeetingsService } from 'src/meetings/meetings.service';
 import { CustomLoggerService } from 'src/logger/logger.service';
 import { Meeting } from 'src/meetings/meeting.entity';
@@ -182,20 +181,6 @@ export class UsermeetingsService {
                 }, {
                     removeOnComplete: true,
                 })
-                // await this.mailerService.sendMail({
-                //     to: user.email,
-                //     subject: `Invitation to meeting: ${meeting.title}`,
-                //     template: 'invitation',
-                //     context: {
-                //         name: user.fullName,
-                //         meetingTitle: meeting.title,
-                //         date: separatedDateAndTime[0],
-                //         time: separatedDateAndTime[1],
-                //         location: meeting.location,
-                //         acceptUrl,
-                //         rejectUrl,
-                //     },
-                // });
             }
 
             this.logger.log(

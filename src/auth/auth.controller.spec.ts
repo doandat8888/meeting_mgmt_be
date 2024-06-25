@@ -17,6 +17,7 @@ describe('AuthController', () => {
     const mockAuthService = {
         signIn: jest.fn(),
         signUp: jest.fn(),
+        refreshToken: jest.fn(),
     };
 
     const mockJwtService = {
@@ -128,5 +129,40 @@ describe('AuthController', () => {
                 createUserDto.fullName
             );
         });
-    })
+
+        it('should handle unexpected errors gracefully', async () => {
+            const createUserDto: CreateUserDto = {
+                email: 'test@example.com',
+                password: 'password',
+                fullName: 'Test'
+            };
+            mockAuthService.signUp.mockRejectedValue(new Error('Unexpected error'));
+
+            await expect(authController.signup(createUserDto)).rejects.toThrow(
+                new Error('Unexpected error'),
+            );
+        });
+    });
+
+    describe('refreshToken', () => {
+        it('should call AuthService.refreshToken and return the result', async () => {
+            const req = { refreshToken: 'validRefreshToken' };
+            const result = {
+                accessToken: 'newAccessToken',
+                refreshToken: 'newRefreshToken',
+            };
+
+            mockAuthService.refreshToken.mockResolvedValue(result);
+
+            expect(await authController.refreshToken(req)).toEqual(result);
+            expect(mockAuthService.refreshToken).toHaveBeenCalledWith(req.refreshToken);
+        });
+
+        it('should throw an error if refreshToken is invalid', async () => {
+            const req = { refreshToken: 'invalidRefreshToken' };
+            mockAuthService.refreshToken.mockRejectedValue(new BadRequestException('Invalid refresh token'));
+            await expect(authController.refreshToken(req)).rejects.toThrow(BadRequestException);
+            expect(mockAuthService.refreshToken).toHaveBeenCalledWith(req.refreshToken);
+        });
+    });
 });

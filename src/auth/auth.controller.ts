@@ -8,10 +8,8 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from 'src/users/dtos/user.dto';
-import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -37,13 +35,11 @@ export class AuthController {
         );
     }
 
-    @UseGuards(AuthGuard)
     @Post('refresh-token')
     async refreshToken(
         @Body() req,
-        @Res({ passthrough: true }) response: Response,
     ) {
-        return this.authService.refreshToken(req.refreshToken, response);
+        return this.authService.refreshToken(req.refreshToken);
     }
 
     // @UseGuards(AuthGuard)

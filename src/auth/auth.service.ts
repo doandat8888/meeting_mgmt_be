@@ -4,7 +4,6 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
 import { CustomLoggerService } from 'src/logger/logger.service';
 import { UsersService } from 'src/users/users.service';
 import { comparePassword, hashPassword } from 'src/utils/hash-password.util';
@@ -37,7 +36,6 @@ export class AuthService {
             };
             const token = await this.jwtService.signAsync(payload);
             const refreshToken = this.jwtService.sign(payload, { expiresIn: '1d' });
-            //this.setCookie(response, token, refreshToken);
             this.logger.log(`User ${email} signed in successfully`);
             return {
                 accessToken: token,
@@ -72,32 +70,36 @@ export class AuthService {
         }
     }
 
-    async refreshToken(refreshToken: string, response: Response) {
+    async refreshToken(refreshToken: string) {
         try {
             const payload = await this.jwtService.verifyAsync(refreshToken, {
                 secret: process.env.JWT_SECRET,
             });
+            if (!payload) {
+                this.logger.error('Invalid refresh token');
+                throw new BadRequestException('Invalid refresh token');
+            }
             const user = await this.usersService.findOne(payload.email);
             if (!user) {
                 this.logger.error('User not found during token refresh');
-                throw new UnauthorizedException('User not found');
+                throw new BadRequestException('User not found');
             }
-            const newPayload = {
-                email: user.email,
-            };
+            const newPayload = { email: user.email };
             const token = await this.jwtService.signAsync(newPayload);
             const newRefreshToken = this.jwtService.sign(newPayload, {
                 expiresIn: '1d',
             });
-            //this.setCookie(response, token, newRefreshToken);
             this.logger.log(`User ${user.email} refreshed token successfully`);
             return {
                 accessToken: token,
                 refreshToken: newRefreshToken,
             };
-        } catch (e) {
-            this.logger.error('Error when refreshing token', e.stack);
-            throw new UnauthorizedException('Internal server error');
+        } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+            this.logger.error('Error when refreshing token', error.stack);
+            throw new BadRequestException('Internal server error');
         }
-    }
+    }    
 }

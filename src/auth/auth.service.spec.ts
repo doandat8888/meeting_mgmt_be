@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
 import { BadRequestException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { comparePassword, hashPassword } from 'src/utils/hash-password.util';
@@ -22,6 +22,8 @@ describe('AuthService', () => {
     const mockJwtService = {
         signAsync: jest.fn(),
         sign: jest.fn(),
+        verifyAsync: jest.fn(),
+        verify: jest.fn(),
     };
 
     const mockLogger = {
@@ -128,6 +130,55 @@ describe('AuthService', () => {
                 fullName: 'Test'
             });
             expect(mockLogger.log).toHaveBeenCalledWith('User test1@example.com signed up successfully');
-        })
+        });
     });
+
+    describe('refreshToken', () => {
+        it('should throw an error if refresh token is invalid', async () => {
+            mockJwtService.verifyAsync.mockRejectedValue(new Error('Invalid token'));
+            await expect(authService.refreshToken('refreshToken')).rejects.toThrow(
+                new BadRequestException('Internal server error'),
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith('Error when refreshing token', expect.any(String));
+        });
+
+        it('should throw an error if user is not found', async() => {
+            const payload = { email: 'test@example.com' };
+            mockJwtService.verifyAsync.mockResolvedValue(payload);
+            mockUsersService.findOne.mockResolvedValue(null);
+            await expect(authService.refreshToken('refreshToken')).rejects.toThrow(
+                new BadRequestException('User not found'),
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith('User not found during token refresh');
+        });
+
+        it('should return new accessToken and refreshToken', async() => {
+            const payload = { email: 'test@example.com' };
+            mockJwtService.verifyAsync.mockResolvedValue(payload);
+            const user = { email: payload.email, password: 'hashedpassword', fullName: 'Dat Doan' };
+            mockUsersService.findOne.mockResolvedValue(user);
+            mockJwtService.signAsync.mockResolvedValue('accessToken');
+            mockJwtService.sign.mockReturnValue('refreshToken');
+
+            const result = await authService.refreshToken('refreshToken');
+            expect(result).toEqual({
+                accessToken: 'accessToken',
+                refreshToken:'refreshToken',
+            })
+            expect(mockLogger.log).toHaveBeenLastCalledWith('User test@example.com refreshed token successfully')
+        });
+
+        it('should throw an error if jwtService.signAsync fails', async () => {
+            const payload = { email: 'test@example.com' };
+            mockJwtService.verifyAsync.mockResolvedValue(payload);
+            const user = { email: payload.email, password: 'hashedpassword', fullName: 'Dat Doan' };
+            mockUsersService.findOne.mockResolvedValue(user);
+            mockJwtService.signAsync.mockRejectedValue(new Error('Signing error'));
+
+            await expect(authService.refreshToken('refreshToken')).rejects.toThrow(
+                new BadRequestException('Internal server error'),
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith('Error when refreshing token', expect.any(String));
+        });
+    })
 });

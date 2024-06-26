@@ -12,10 +12,9 @@ import { UsermeetingsModule } from './usermeetings/usermeetings.module';
 import { FilesModule } from './files/files.module';
 import { MeetingminutesModule } from './meetingminutes/meetingminutes.module';
 import { LoggerModule } from './logger/logger.module';
-import { HandlebarsAdapter, MailerModule } from '@nest-modules/mailer';
-import { join } from 'path';
 import { BullModule } from '@nestjs/bull';
 import { bullConfig } from './configs/bull.config';
+import { MailModule } from './mail/mail.module';
 
 @Module({
     imports: [
@@ -23,30 +22,6 @@ import { bullConfig } from './configs/bull.config';
             isGlobal: true,
         }),
         TypeOrmModule.forRootAsync(typeOrmConfig),
-        MailerModule.forRootAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                transport: {
-                    host: configService.get<string>('MAIL_HOST'),
-                    secure: false,
-                    auth: {
-                        user: configService.get<string>('MAIL_USER'),
-                        pass: configService.get<string>('MAIL_PASS')
-                    }
-                },
-                defaults: {
-                    from: `"CLV Meeting" <${configService.get('MAIL_FROM')}>`
-                },
-                template: {
-                    dir: join(__dirname, 'templates/email'),
-                    adapter: new HandlebarsAdapter(),
-                    options: {
-                        strict: true
-                    }
-                }
-            }),
-            inject: [ConfigService]
-        }),
         BullModule.forRootAsync(bullConfig),
         UsersModule,
         AuthModule,
@@ -56,6 +31,7 @@ import { bullConfig } from './configs/bull.config';
         FilesModule,
         MeetingminutesModule,
         LoggerModule,
+        MailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

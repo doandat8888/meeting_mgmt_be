@@ -9,6 +9,7 @@ import { UsersModule } from 'src/users/users.module';
 import { MeetingsModule } from 'src/meetings/meetings.module';
 import { BullModule } from '@nestjs/bull';
 import { EmailConsumer } from './consumers/email.consumer';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
     imports: [
@@ -16,12 +17,10 @@ import { EmailConsumer } from './consumers/email.consumer';
         JwtModule.registerAsync(jwtConfig),
         UsersModule,
         forwardRef(() => MeetingsModule),
-        BullModule.registerQueue({
-            name: 'send-mail',
-        })
+        MailModule
     ],
     controllers: [UsermeetingsController],
-    providers: [UsermeetingsService, EmailConsumer],
+    providers: [UsermeetingsService],
     exports: [UsermeetingsService]
 })
 export class UsermeetingsModule { }

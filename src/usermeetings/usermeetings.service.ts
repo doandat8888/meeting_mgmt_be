@@ -15,6 +15,7 @@ import { MailerService } from '@nest-modules/mailer';
 import { format } from 'date-fns';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsermeetingsService {
@@ -23,10 +24,8 @@ export class UsermeetingsService {
         private userService: UsersService,
         @Inject(forwardRef(() => MeetingsService))
         private meetingService: MeetingsService,
-        private mailerService: MailerService,
-        private readonly logger: CustomLoggerService,
-        @InjectQueue('send-mail')
-        private sendMail: Queue
+        private mailService: MailService,
+        private readonly logger: CustomLoggerService
     ) { }
 
     async findOne(userId: string, meetingId: string): Promise<UserMeeting> {
@@ -169,17 +168,13 @@ export class UsermeetingsService {
             const acceptUrl = `http://localhost:8000/usermeetings/changeStatus?userId=${userId}&meetingId=${meetingId}&status=accepted`;
             const rejectUrl = `http://localhost:8000/usermeetings/changeStatus?userId=${userId}&meetingId=${meetingId}&status=rejected`;
             if (user) {
-                await this.sendMail.add('invitation', {
-                    to: user.email,
-                    name: user.fullName,
-                    meetingTitle: meeting.title,
+                await this.mailService.sendEmail({
+                    recipient: user,
+                    meeting: meeting,
                     date: separatedDateAndTime[0],
                     time: separatedDateAndTime[1],
-                    location: meeting.location,
                     acceptUrl,
-                    rejectUrl,
-                }, {
-                    removeOnComplete: true,
+                    rejectUrl
                 })
             }
 
